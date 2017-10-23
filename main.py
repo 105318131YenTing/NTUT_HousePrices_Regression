@@ -19,6 +19,8 @@ vy = datasetv[ 1:2162 , 1 ]
 vz = pd.read_csv('C:/Users/Sam/Desktop/Deep_Learning_Class/HousePrices_Regression/test-v3.csv',header=None)
 datasetvz = vz.values
 vz = datasetvz[ 1:6486 , 1:22 ]
+idt = datasetvz[1:6486 , 0]
+idt = idt.astype(int)
 
 
 tX=np.vstack((tX,tX,tX,tX,tX,tX,tX,tX))
@@ -32,8 +34,7 @@ from keras.layers import Dense
 def build_nn():
     model = Sequential()
     
-    model.add(Dense(1024, input_dim=21,  kernel_initializer='normal', activation='relu'))
-    model.add(Dense(2048 , kernel_initializer='normal', activation='relu'))
+    model.add(Dense(2048, input_dim=21,  kernel_initializer='normal', activation='relu'))
     model.add(Dense(1024 , kernel_initializer='normal', activation='relu'))
     model.add(Dense(512 ,  kernel_initializer='normal', activation='relu'))
     model.add(Dense(256 ,kernel_initializer='normal', activation='relu'))
@@ -56,7 +57,7 @@ import seaborn as sns
 estimators = []
 estimators.append(('standardise', StandardScaler()))
 
-estimators.append(('multiLayerPerceptron', KerasRegressor(build_fn=build_nn, nb_epoch=150, batch_size=5, verbose=0)))
+estimators.append(('multiLayerPerceptron', KerasRegressor(build_fn=build_nn, nb_epoch=100, batch_size=5, verbose=0)))
 
 pipeline = Pipeline(estimators)
 
@@ -80,14 +81,11 @@ sns.regplot('True Value', 'Prediction', sample_df)
 print (pipeline.predict(vz))
 predict1 = pipeline.predict(vz)
 predict1 = predict1.astype(int)
-np.savetxt("predict1.csv",predict1,delimiter=",",header = "'id',price")
-vzy=len(predict1)
-idz = np.arange(vzy, dtype=np.int32).reshape( vzy,1 )
 
-predict1=np.vstack(idz,predict1)
+predict1=np.vstack((idt,predict1))
+predict1=predict1.T
 
-np.savetxt("predict1.csv",predict1,delimiter=",",header = "'id',price")
-
+np.savetxt("predict1.csv",predict1,delimiter=",",header = "id,price")
 
 
 
